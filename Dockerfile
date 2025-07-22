@@ -1,25 +1,20 @@
-# Start from an official Ubuntu image
-FROM ubuntu:22.04
+# Use official Python image
+FROM python:3.11-slim
 
-# Set the working directory
+# Set working directory inside the container
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip
+# Copy requirements first and install dependencies
+COPY requirements.txt .
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python dependencies
-RUN pip3 install -r requirements.txt
+# Copy project files
+COPY . .
 
-# Copy the rest of the app
-COPY . /app/
-
-# Expose the Django default port
+# Expose port 8000
 EXPOSE 8000
 
-# Run the Django app
-ENTRYPOINT ["python3", "manage.py"]
-CMD ["runserver", "0.0.0.0:8000"]
+# Command to run the Django development server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
